@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) Microsoft Open Technologies, Inc.  All Rights Reserved. 
+ Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
+-->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+xmlns:android="http://schemas.android.com/apk/res/android"
+           id="com.msopentech.websql"
+      version="0.0.1">
+    <name>Web SQL plugin</name>
+
+    <description>Web Sql Plugin for Apache Cordova</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova, websql, db, database</keywords>
+    <repo>TODO</repo>
+    <issue>TODO</issue>
+
+    <platform name="wp8">
+        <js-module src="www/WebSQL.js" name="WebSQL">
+            <merges target="window" />
+        </js-module>
+        <js-module src="www/Database.js" name="Database" />
+        <js-module src="www/SqlTransaction.js" name="SqlTransaction" />
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="WebSql">
+                <param name="wp-package" value="WebSql"/>
+            </feature>
+        </config-file>
+        <source-file src="src/wp/WebSql.cs" />
+        <source-file src="src/wp/SQLite.cs" />
+        <framework src="src/wp/Community.CsharpSqlite.WinPhone.dll" custom="true"/>
+    </platform>
+
+    <platform name="windows8">
+        <js-module src="www/WebSQL.js" name="WebSQL">
+            <merges target="window" />
+        </js-module>
+        <js-module src="www/Database.js" name="Database" />
+        <js-module src="www/SqlTransaction.js" name="SqlTransaction" />
+
+        <framework src="src/windows8/SQLite.Proxy.winmd" custom="true"/>
+        <framework src="src/windows8/SQLitePCL.dll" custom="true"/>
+        <framework src="src/windows8/SQLitePCL.Ext.dll" custom="true"/>
+        <lib-file Include="Microsoft.VCLibs, version=11.0"/>
+        <lib-file Include="SQLite.WinRT, Version=3.8.2"/>
+
+        <js-module src="src/windows8/WebSqlProxy.js" name="WebSqlProxy">
+            <merges target="" />
+        </js-module>
+
+        <source-file src="src/windows8/cordova-plugin-websql.bat" target-dir="../../../../../hooks/before_build"/>
+        <source-file src="src/windows8/lib/cordova-plugin-websql.js" target-dir="../../../../../hooks/before_build/lib"/>
+    </platform>
+</plugin>
