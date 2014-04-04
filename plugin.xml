@@ -12,8 +12,8 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     <description>Web Sql Plugin for Apache Cordova</description>
     <license>Apache 2.0</license>
     <keywords>cordova, websql, db, database</keywords>
-    <repo>TODO</repo>
-    <issue>TODO</issue>
+    <repo>https://github.com/msopentech/cordova-plugin-websql/</repo>
+    <issue>https://github.com/msopentech/cordova-plugin-websql/issues</issue>
 
     <platform name="wp8">
         <js-module src="www/WebSQL.js" name="WebSQL">
