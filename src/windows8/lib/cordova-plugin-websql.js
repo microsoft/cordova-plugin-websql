@@ -121,10 +121,15 @@ function patchSolution(path) {
     //     Log('Already patched, skip...');
     //     return;
     // }
-
+    // TODO: refactor
+    // Debug
     projContent = projContent.replace(/Any CPU.ActiveCfg = Debug\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.ActiveCfg = Debug|' + targetPlatform);
     projContent = projContent.replace(/Any CPU.Build.0 = Debug\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Build.0 = Debug|' + targetPlatform);
     projContent = projContent.replace(/Any CPU.Deploy.0 = Debug\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Deploy.0 = Debug|' + targetPlatform);
+    // Release
+    projContent = projContent.replace(/Any CPU.ActiveCfg = Release\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.ActiveCfg = Release|' + targetPlatform);
+    projContent = projContent.replace(/Any CPU.Build.0 = Release\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Build.0 = Release|' + targetPlatform);
+    projContent = projContent.replace(/Any CPU.Deploy.0 = Release\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Deploy.0 = Release|' + targetPlatform);
 
     write(projFile, projContent);
 }
