@@ -88,6 +88,21 @@ function patchProject(path) {
     write(projFile, projContent);
 }
 
+function getTargetPlatform() {
+    var buildCmd = wscript_shell.ExpandEnvironmentStrings("%CORDOVA_CMDLINE%").toLowerCase();
+    
+    if (buildCmd.indexOf('--arm')>=0) {
+        return'ARM';
+    }
+
+    if (buildCmd.indexOf('--x86')>=0) {
+        return 'x86';
+    }
+
+    // default
+    return 'x64';
+}
+
 function patchSolution(path) {
     Log('Patching windows8 solution file:');
     var projFile = getFileByExtension(path, 'sln');
@@ -97,16 +112,24 @@ function patchSolution(path) {
     };
     Log('\t' + projFile);
     
+    var targetPlatform = getTargetPlatform();
+    Log('\tTarget build platform: ' + targetPlatform);
+
     var projContent = read(projFile);
 
-    if (projContent.indexOf('ActiveCfg = Debug|Any CPU') <= 0) {
-        Log('Already patched, skip...');
-        return;
-    }
-
-    projContent = projContent.replace('ActiveCfg = Debug|Any CPU', 'ActiveCfg = Debug|x64');
-    projContent = projContent.replace('Build.0 = Debug|Any CPU', 'Build.0 = Debug|x64');
-    projContent = projContent.replace('Deploy.0 = Debug|Any CPU', 'Deploy.0 = Debug|x64');
+    // if (projContent.indexOf('ActiveCfg = Debug|Any CPU') <= 0) {
+    //     Log('Already patched, skip...');
+    //     return;
+    // }
+    // TODO: refactor
+    // Debug
+    projContent = projContent.replace(/Any CPU.ActiveCfg = Debug\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.ActiveCfg = Debug|' + targetPlatform);
+    projContent = projContent.replace(/Any CPU.Build.0 = Debug\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Build.0 = Debug|' + targetPlatform);
+    projContent = projContent.replace(/Any CPU.Deploy.0 = Debug\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Deploy.0 = Debug|' + targetPlatform);
+    // Release
+    projContent = projContent.replace(/Any CPU.ActiveCfg = Release\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.ActiveCfg = Release|' + targetPlatform);
+    projContent = projContent.replace(/Any CPU.Build.0 = Release\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Build.0 = Release|' + targetPlatform);
+    projContent = projContent.replace(/Any CPU.Deploy.0 = Release\|(x64|x86|ARM|Any CPU)/g, 'Any CPU.Deploy.0 = Release|' + targetPlatform);
 
     write(projFile, projContent);
 }
