@@ -4,7 +4,7 @@ Adds WebSQL functionality as Apache Cordova Plugin implemetned on top of native 
 
 ### Sample usage ###
 
-Plugin follows [WebDatabase](http://www.w3.org/TR/webdatabase/) specification, no special changes are required. See sample usage below.
+Plugin follows [WebDatabase](http://www.w3.org/TR/webdatabase/) specification, no special changes are required. The following sample code creates `todo` table (if not exist) and adds new record. Complete example is available [here](https://github.com/MSOpenTech/cordova-plugin-websql/tree/master/test).
 
     var dbSize = 5 * 1024 * 1024; // 5MB
 
@@ -13,10 +13,19 @@ Plugin follows [WebDatabase](http://www.w3.org/TR/webdatabase/) specification, n
     });
 
     db.transaction(function (tx) {
-        tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)",
-            ['my todo item', new Date()], onSuccess, onError);
+        tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on DATETIME)",
+            [], onSuccess, onError);
+        tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", ['my todo item', new Date()], onSuccess, onError);
     });
-
+    
+    function onSuccess(transaction, resultSet) {
+        console.log('Query completed: ' + JSON.stringify(resultSet));
+    }
+    
+    function onError(error) {
+        console.log('Query failed: ' + error.message);
+    }
+    
 ### Installation Instructions ###
 
 Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html) 3.x compliant. 
