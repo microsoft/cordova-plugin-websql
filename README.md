@@ -22,7 +22,7 @@ Plugin follows [WebDatabase](http://www.w3.org/TR/webdatabase/) specification, n
         console.log('Query completed: ' + JSON.stringify(resultSet));
     }
     
-    function onError(error) {
+    function onError(transaction, error) {
         console.log('Query failed: ' + error.message);
     }
     

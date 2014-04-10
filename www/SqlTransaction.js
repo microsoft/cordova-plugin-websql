@@ -17,7 +17,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
     var me = this;
 
     this.sql = sql;
-    this.params = params;
+    this.params = params || [];
     this.successCallback = function (res) {
         // add missing .item() method as per http://www.w3.org/TR/webdatabase/#sqlresultset
         res.rows.item = function(index) {
@@ -27,16 +27,24 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
             return res.rows[index];
         };
 
+        // process rows to be W3C spec compliant; TODO - this must be done inside native part for performance reasons
         for (idxRow = 0; idxRow < res.rows.length; idxRow++) {
-            var row = res.rows[idxRow];
-            for (idxColumn = 0; idxColumn < row.length; idxColumn++) {
-                row[row[idxColumn].Key] = row[idxColumn].Value;
-            }
+            var originalRow = res.rows[idxRow],
+                refinedRow = {},
+                idxColumn;
+              
+            res.rows[idxRow] = refinedRow;
+
+            for (idxColumn in originalRow) {
+                refinedRow[originalRow[idxColumn].Key] = originalRow[idxColumn].Value;
+            } 
         }
        
         onSuccess(me, res);
     };
-    this.errorCallback = onError;
+    this.errorCallback = function (error) {
+        onError && onError(me, error);
+    };
     
     try {
         exec(this.successCallback, this.errorCallback, "WebSql", "executeSql", [this.sql, this.params]);

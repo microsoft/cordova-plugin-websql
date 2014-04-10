@@ -9,7 +9,7 @@ var WebSQL = {};
 
 // Database openDatabase(in DOMString name, in DOMString version, in DOMString displayName, in unsigned long estimatedSize, in optional DatabaseCallback creationCallback
 // http://www.w3.org/TR/webdatabase/#databases
-WebSQL.openDatabase = function (name, version, displayName, estimatedSize, creationCallback) {
+WebSQL.openDatabase = window.openDatabase || function (name, version, displayName, estimatedSize, creationCallback) {
     return new Database(name, version, displayName, estimatedSize, creationCallback);
 };
 

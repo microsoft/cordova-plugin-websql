@@ -8,15 +8,14 @@ var app = {
     initialize: function () {
         this.db = null;
         this.bindEvents();
-        window.onError = this.onError;
     },
 
-    onError: function (msg) {
-        console.log('Error: ' + msg);
-        document.getElementById("lblInfo").innerHTML = 'ERROR: ' + msg;
+    onError: function (transaction, error) {
+        console.log('Error: ' + error.message);
+        document.getElementById("lblInfo").innerHTML = 'ERROR: ' + error.message;
     },
 
-    onSuccess: function (msg) {
+    onSuccess: function (transaction, resultSet) {
         console.log('Operation completed successfully');
         app.getAllTodoItems();
     },
