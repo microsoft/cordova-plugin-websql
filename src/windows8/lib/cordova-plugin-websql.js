@@ -134,10 +134,11 @@ function patchSolution(path) {
     write(projFile, projContent);
 }
 
-if ('windows8' != wscript_shell.ExpandEnvironmentStrings("%CORDOVA_PLATFORMS%")) {
+var platform = wscript_shell.ExpandEnvironmentStrings("%CORDOVA_PLATFORMS%");
+if (platform && platform != 'windows8') {
     Log('Platform is not windows8, skip..');
 } else {
-    var root = WScript.ScriptFullName.split('\\hooks\\before_build\\lib\\cordova-plugin-websql.js').join('');
+    var root = WScript.ScriptFullName.split('\\hooks\\pre_package\\lib\\cordova-plugin-websql.js').join('');
     var projRoot = root + '\\platforms\\windows8';
     // not required anymore since plugman now provides <lib-file/>
     //patchProject(projRoot);
