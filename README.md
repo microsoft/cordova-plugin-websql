@@ -1,6 +1,6 @@
 WebSQL plugin for Apache Cordova
 ==================================
-Adds WebSQL functionality as Apache Cordova Plugin implemetned on top of native SQLite database. Support of Windows Phone8 and Windows8.
+Adds WebSQL functionality as Apache Cordova Plugin implemented on top of native SQLite database. Support of Windows Phone8 and Windows8.
 
 ### Sample usage ###
 
