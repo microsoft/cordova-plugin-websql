@@ -105,10 +105,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SQLitePCL">
-      <HintPath>D:\Projects\Html5\git\cordova\cordova-plugin-websql\src\windows8\SQLitePCL.dll</HintPath>
+      <HintPath>..\SQLitePCL.dll</HintPath>
     </Reference>
     <Reference Include="SQLitePCL.Ext">
-      <HintPath>D:\Projects\Html5\git\cordova\cordova-plugin-websql\src\windows8\SQLitePCL.Ext.dll</HintPath>
+      <HintPath>..\SQLitePCL.Ext.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
