@@ -50,6 +50,5 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         </js-module>
 
         <source-file src="src/windows8/cordova-plugin-websql.bat" target-dir="../../../../../hooks/pre_package"/>
-        <source-file src="src/windows8/lib/cordova-plugin-websql.js" target-dir="../../../../../hooks/pre_package/lib"/>
     </platform>
 </plugin>
