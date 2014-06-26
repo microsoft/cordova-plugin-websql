@@ -54,7 +54,7 @@ To learn more, read [Apache Cordova CLI Usage Guide](http://cordova.apache.org/d
 
 ### Prerequisites ###
 
-In order to build plugin for __Windows8__ target platform, you must manually install the [SQLite for Windows Runtime Extension SDK v3.8.2](http://sqlite.org/2013/sqlite-winrt-3080200.vsix). Note: once downloaded, you will have the change the extension of the file from .zip to .vsix before double-clicking to install.
+In order to build plugin for __Windows8__ target platform, you must manually install the [SQLite for Windows Runtime Extension SDK v3.8.2](http://sqlite.org/2013/sqlite-winrt-3080200.vsix). Note: some browsers will replace the extension of the file from .vsix to .zip when downloading it. If that is the case for you, change the extension of the file back from .zip to .vsix before double-clicking to install.
 
 ### Quirks ###
  * The db version, display name, and size parameter values are not supported and will be ignored
