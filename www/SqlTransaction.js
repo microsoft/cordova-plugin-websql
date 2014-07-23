@@ -40,7 +40,9 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
             } 
         }
        
-        onSuccess(me, res);
+	    // Success might be null or undefined
+	    if (onSuccess)
+			onSuccess(me, res);
     };
     this.errorCallback = function (error) {
         onError && onError(me, error);
