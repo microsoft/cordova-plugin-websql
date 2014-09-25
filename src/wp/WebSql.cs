@@ -48,6 +48,29 @@ namespace Cordova.Extension.Commands
                 Value = value;
             }
         }
+        
+        [DataContract]
+        private class ConnectionInfo
+        {
+            [DataMember(Name = "connectionId")]
+            public long Id;
+        }
+
+        [DataContract]
+        private class SQliteError
+        {
+            [DataMember(Name = "message")] 
+            public string Message;
+            [DataMember(Name = "code")] 
+            public int Code;
+
+            public SQliteError(Exception ex)
+            {
+                Message = ex.Message;
+                if (ex is SQLiteException)
+                    Code = (int)((SQLiteException)ex).Result;
+            }
+        }
 
         /// <summary>
         /// Represents database path.
@@ -57,11 +80,12 @@ namespace Cordova.Extension.Commands
         /// <summary>
         /// Represents database connection instance.
         /// </summary>
-        private SQLiteConnection _db;
+        private Dictionary<long, SQLiteConnection> _dbConnections = new Dictionary<long, SQLiteConnection>();
+        private static readonly object _locker = new Object();
+        private int _retriesCount = 3;
 
         /// <summary>
-        /// Opens existing database or creates a new one with the file name specified.
-        /// We don't test connection to the database here, we just save database name for further access.
+        /// We don't connect to the database here, we just save database name for further access.
         /// </summary>
         /// <param name="options"></param>
         public void open(string options)
@@ -71,32 +95,79 @@ namespace Cordova.Extension.Commands
                 var args = JsonHelper.Deserialize<List<string>>(options);
 
                 String dbName = args[0];
-
-                if (string.IsNullOrEmpty(dbName))
-                {
-                    DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, "No database name provided"));
-                    return;
-                }
-
                 _dbName = dbName;
-
+                DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
             }
             catch (Exception ex)
             {
-                DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, ex.Message));
+                DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, new SQliteError(ex)));
             }
         }
 
         /// <summary>
-        /// Closes connection to database.
+        /// Remove dbName.
         /// </summary>
         /// <param name="options"></param>
         public void close(string options)
         {
-            if (_db != null)
+            _dbName = string.Empty;
+
+            DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+        }
+
+        public void connect(string options)
+        {
+            lock (_locker)
             {
-                _db.Dispose();
-                _db = null;
+                var args = JsonHelper.Deserialize<List<string>>(options);
+                string dbName = args[0];
+
+                for (int i = 0; i < _retriesCount; i++)
+                {
+                    try
+                    {
+                        var result = new ConnectionInfo();
+
+                        var newId = _dbConnections.Keys.DefaultIfEmpty(0).Max() + 1;
+                        _dbConnections.Add(newId, new SQLiteConnection(dbName));
+                        result.Id = newId;
+                        DispatchCommandResult(new PluginResult(PluginResult.Status.OK, result));
+
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (i == _retriesCount - 1)
+                        {
+                            DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, new SQliteError(ex)));
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        public void disconnect(string options)
+        {
+            var args = JsonHelper.Deserialize<List<string>>(options);
+            try
+            {
+                var connectionId = int.Parse(args[0]);
+                if (_dbConnections.ContainsKey(connectionId))
+                {
+                    var connection = _dbConnections[connectionId];
+                    connection.Dispose();
+                    _dbConnections.Remove(connectionId);
+                } 
+                else 
+                {
+                    throw new ArgumentException("No such connection! (connectionId = " + connectionId + ")");
+                }
+            }
+            catch (Exception ex)
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, new SQliteError(ex)));
+                return;
             }
 
             DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
@@ -111,40 +182,33 @@ namespace Cordova.Extension.Commands
             var args = JsonHelper.Deserialize<List<string>>(options);
             try
             {
-                if (_db == null)
-                    _db = new SQLiteConnection(_dbName);
+                var connectionId = int.Parse(args[0]);
 
-                var query = args[0];
-                var queryParams = string.IsNullOrEmpty(args[1])
-                                       ? new object[0]
-                                       : JsonHelper.Deserialize<object[]>(args[1]);
+                if (_dbConnections[connectionId] == null)
+                    _dbConnections[connectionId] = new SQLiteConnection(_dbName);
 
-                _db.RunInTransaction(() =>
-                {    
-                    if (query.IndexOf("DROP TABLE", StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        //-- bug where drop tabe does not work
-                        query = Regex.Replace(query, "DROP TABLE IF EXISTS", "DELETE FROM", RegexOptions.IgnoreCase);
-                        query = Regex.Replace(query, "DROP TABLE", "DELETE FROM", RegexOptions.IgnoreCase);
-                    }
+                var query = args[1];
+                var queryParams = string.IsNullOrEmpty(args[2])
+                    ? new object[0]
+                    : JsonHelper.Deserialize<object[]>(args[2]);
 
-                    var resultSet = new SqlResultSet();
+                var resultSet = new SqlResultSet();
 
-                    foreach (var row in _db.Query2(query, queryParams))
-                    {
-                        var resultRow = new QueryRow();
-                        resultRow.AddRange(row.column.Select(column => new QueryColumn(column.Key, column.Value)));
-                        resultSet.Rows.Add(resultRow);
-                    }
+                foreach (var row in _dbConnections[connectionId].Query2(query, queryParams))
+                {
+                    var resultRow = new QueryRow();
+                    resultRow.AddRange(row.column.Select(column => new QueryColumn(column.Key, column.Value)));
+                    resultSet.Rows.Add(resultRow);
+                }
 
-                    DispatchCommandResult(new PluginResult(PluginResult.Status.OK, resultSet));
-                });
+                resultSet.InsertId = SQLite3.LastInsertRowid(_dbConnections[connectionId].Handle);
+                resultSet.RowsAffected = SQLite3.Changes(_dbConnections[connectionId].Handle);
+                DispatchCommandResult(new PluginResult(PluginResult.Status.OK, resultSet));
             }
             catch (Exception ex)
             {
-                DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, ex.Message));
+                DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, new SQliteError(ex)));
             }
-            
         }
     }
 }

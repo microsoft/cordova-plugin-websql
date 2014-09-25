@@ -16,6 +16,28 @@
                 console.log('Err: ' + msg);
             }
         </script>
+        <style>
+        #status {
+            padding: 5px;
+            color: #fff;
+            background: #ccc;
+        }
+         
+        #status.error {
+            background: #c00;
+        }
+         
+        #status.ok {
+            background: #0c0;
+        }
+
+        label {
+            float: left;
+            display: block;
+            width: 125px;
+            line-height: 32px;
+        }          
+        </style>
     </head>
     <body>
         <div class="app">
@@ -28,7 +50,19 @@
             <button id="btnCreateTable">Create/Open Table</button>
             <input type='text' id="lblTodoText" value="Sample item"/>
             <button id="btnAddItem">Add item</button>
+            <button id="btnDeleteAll">Delete all items</button>
+            <button id="btnTestEvents">Test rollback and events</button>            
+            <button id="btnTestJSONBlob">Test JSON blob</button>
+            <button id="btnTestRollbacksAfterFailures">Test rollbacks after failures</button>
+            <button id="bthTestLongTransactions">Test long transactions</button>
+            <button id="btnTestPrelightPostflight">Test preflight/postflight</button>
+            <button id="btnTestNestedTransaction">Test nested</button>
+            <p id="lblTxInfo"></p>
             <p id="lblInfo"></p>
+            <p id="lblDBInfo"></p>
+            <p id="lblDBError"></p>
+            <p id="console"></p>
+	    <section id="status" class="ok">ready</section>
         </div>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
