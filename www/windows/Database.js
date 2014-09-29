@@ -2,7 +2,7 @@
  * Copyright (c) Microsoft Open Technologies, Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
  */
-var exec = require('cordova/exec');
+var exec = require('cordova/exec'),
     SqlTransaction = require('./SqlTransaction');
 
 var Database = function (name, version, displayName, estimatedSize, creationCallback) {
@@ -18,11 +18,21 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
 
     this.lastTransactionId = 0;
 
-    exec(creationCallback, null, "WebSql", "open", [this.name]);    
+    console.log('new Database(); name = ' + name);
+    exec(creationCallback, function (err) {
+        console.log('Database.open() err = ' + JSON.stringify(err));
+    }, "WebSql", "open", [this.name]);
+};
+
+Database.prototype.Log = function (text) {
+    console.log('[Database] name: ' + this.name + ', lastTransactionId: ' + this.lastTransactionId + '. | ' + text);
 };
 
 Database.prototype.transaction = function (cb, onError, onSuccess, preflight, postflight, readOnly, parentTransaction) {
+    this.Log('transaction');
+
     if (typeof cb !== "function") {
+        this.Log('transaction callback expected');
         throw new Error("transaction callback expected");
     }
 
@@ -40,6 +50,12 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
         try {
             if (isRoot) {
                 exec(function(res) {
+                    if (!res.connectionId) {
+                        me.Log('transaction.run DB connection error');
+                        throw new Error('Could not establish DB connection');
+                    }
+
+                    //me.Log('transaction.run.connectionSuccess, res.connectionId: ' + res.connectionId);
                     tx.connectionId = res.connectionId;
                 }, null, "WebSql", "connect", []);
             } else {
@@ -55,9 +71,9 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
             try {
                 cb(tx);
             } catch (cbEx) {
-                console.log('Database.prototype.transaction callback error; lastTransactionId = ' + JSON.stringify(this.lastTransactionId) + '; err = ' + JSON.stringify(cbEx));
+                me.Log('Database.prototype.transaction callback error; lastTransactionId = ' + JSON.stringify(me.lastTransactionId) + '; err = ' + JSON.stringify(cbEx));
                 throw cbEx;
-            }                        
+            }
 
             if (postflight) {
                 postflight();
@@ -65,6 +81,8 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
 
             tx.executeSql('RELEASE trx' + tx.id);
         } catch (ex) {
+            me.Log('transaction.run callback error, lastTransactionId = ' + JSON.stringify(me.lastTransactionId) + '; error: ' + ex);
+
             tx.executeSql('ROLLBACK TO trx' + tx.id);
             tx.executeSql('RELEASE trx' + tx.id);
             if (onError) {
@@ -81,6 +99,7 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
             onSuccess();
         }
     };
+
     if (isRoot) {
         setTimeout(runTransaction, 0);
     } else {
@@ -90,6 +109,6 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
 
 Database.prototype.readTransaction = function (cb, onError, onSuccess, preflight, postflight, parentTransaction) {
     this.transaction(cb, onError, onSuccess, preflight, postflight, true, parentTransaction);
-}
+};
 
 module.exports = Database;

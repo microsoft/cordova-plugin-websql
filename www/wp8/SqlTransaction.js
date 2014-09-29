@@ -18,7 +18,7 @@ var SqlTransaction = function (onError, onSuccess, postflight, readOnly, transac
     this.transactionStarted = false;
 
     this.errorOccured = false;
-    this.Log('ctor');
+    //this.Log('ctor');
 };
 
 SqlTransaction.prototype.Log = function (text) {
@@ -26,20 +26,20 @@ SqlTransaction.prototype.Log = function (text) {
 };
 
 SqlTransaction.prototype.statementCompleted = function () {
-    this.Log('statementCompleted');
+    //this.Log('statementCompleted');
 
     var me = this;
     if (this.errorOccured !== false) {
-        me.Log('statementCompleted - error occured, going to ROLLBACK...');
+        //me.Log('statementCompleted - error occured, going to ROLLBACK...');
 
         exec(function() {
-            me.Log('statementCompleted - error occured, ROLLBACK SUCCESS!');
+            //me.Log('statementCompleted - error occured, ROLLBACK SUCCESS!');
 
             exec(function () {
-                me.Log('statementCompleted - error occured, ROLLBACK SUCCESS, going to DISCONNECT');
+                //me.Log('statementCompleted - error occured, ROLLBACK SUCCESS, going to DISCONNECT');
                 if (me.isRoot) {
                     exec(function () {
-                        me.Log('statementCompleted - error occured, ROLLBACK SUCCESS, DISCONNECTed successfully');
+                        //me.Log('statementCompleted - error occured, ROLLBACK SUCCESS, DISCONNECTed successfully');
                     }, function (err) {
                         me.Log('statementCompleted - error occured, ROLLBACK SUCCESS, DISCONNECT error: ' + JSON.stringify(err));
                     }, "WebSql", "disconnect", [me.connectionId]);
@@ -59,7 +59,7 @@ SqlTransaction.prototype.statementCompleted = function () {
         }, "WebSql", "executeSql", [this.connectionId, 'ROLLBACK TO trx' + this.id, []]);
 
     } else if (this.statementsQueue.length === 0) {
-        me.Log('statementCompleted - statementsQueue is empty, transactionStarted: ' + me.transactionStarted);
+        //me.Log('statementCompleted - statementsQueue is empty, transactionStarted: ' + me.transactionStarted);
 
         exec(function () {
             if (me.postflight) {
@@ -67,9 +67,9 @@ SqlTransaction.prototype.statementCompleted = function () {
             }
 
             if (me.isRoot) {
-                me.Log('statementCompleted - statementsQueue is empty, going to DISCONNECT after COMMIT');
+                //me.Log('statementCompleted - statementsQueue is empty, going to DISCONNECT after COMMIT');
                 exec(function () {
-                    me.Log('statementCompleted - statementsQueue is empty, DISCONNECT after COMMIT success');
+                    //me.Log('statementCompleted - statementsQueue is empty, DISCONNECT after COMMIT success');
                     if (me.onSuccess) {
                         me.onSuccess();
                     }
@@ -88,7 +88,7 @@ SqlTransaction.prototype.statementCompleted = function () {
     }
     else {
         var taskForRun = this.statementsQueue.shift();
-        me.Log('statementCompleted - executing next query: ' + JSON.stringify(taskForRun));
+        //me.Log('statementCompleted - executing next query: ' + JSON.stringify(taskForRun));
 
         try {
             taskForRun.task.apply(this, taskForRun.params);
@@ -103,14 +103,14 @@ SqlTransaction.prototype.statementCompleted = function () {
             this.statementCompleted();
         }
     }
-}
+};
 
 SqlTransaction.prototype.pushTransaction = function(tx, cb, onError, onSuccess, preflight, postflight, readOnly, parentTransaction) {
-    if (!!parentTransaction) {
-        this.Log('pushTransaction: parentTransaction.id: ' + parentTransaction.id + ', parentTransaction.connectionId: ' + parentTransaction.connectionId + ', new tx.id: ' + tx.id);
-    } else {
-        this.Log('pushTransaction: parentTransaction is not defined');
-    }
+    //if (!!parentTransaction) {
+    //    this.Log('pushTransaction: parentTransaction.id: ' + parentTransaction.id + ', parentTransaction.connectionId: ' + parentTransaction.connectionId + ', new tx.id: ' + tx.id);
+    //} else {
+    //    this.Log('pushTransaction: parentTransaction is not defined');
+    //}
 
     var me = this;
 
@@ -119,14 +119,14 @@ SqlTransaction.prototype.pushTransaction = function(tx, cb, onError, onSuccess, 
             onSuccess();
 
         me.statementCompleted();
-    }
+    };
 
     this.transactionError = function (tx, lastError) {
         if (onError)
             onError(tx, lastError);
 
         me.statementCompleted();
-    }
+    };
 
     tx.onSuccess = this.transactionSuccess;
     tx.onError = this.transactionError;
@@ -134,7 +134,7 @@ SqlTransaction.prototype.pushTransaction = function(tx, cb, onError, onSuccess, 
     var runTransaction = function () {
         try {
             var connectionSuccess = function (res) {
-                me.Log('pushTransaction.connectionSuccess, res.connectionId: ' + res.connectionId);
+                //me.Log('pushTransaction.connectionSuccess, res.connectionId: ' + res.connectionId);
                 if (!res.connectionId) {
                     throw new Error('Could not establish DB connection');
                 }
@@ -143,7 +143,7 @@ SqlTransaction.prototype.pushTransaction = function(tx, cb, onError, onSuccess, 
 
                 try {
                     var executeTransaction = function () {
-                        me.Log('pushTransaction.executeTransaction callback');
+                        //me.Log('pushTransaction.executeTransaction callback');
                         if (preflight) {
                             preflight();
                         }
@@ -154,19 +154,19 @@ SqlTransaction.prototype.pushTransaction = function(tx, cb, onError, onSuccess, 
                             me.Log('pushTransaction.executeTransaction callback error: ' + JSON.stringify(cbEx));
                             me.transactionError(tx, cbEx);
                         }
-                    }
+                    };
 
                     var internalError = function (tx, err) {
                         me.Log('pushTransaction.executeTransaction internalError: ' + JSON.stringify(err));
                         me.transactionError(tx, err);
-                    }
+                    };
 
                     exec(executeTransaction, internalError, "WebSql", "executeSql", [tx.connectionId, 'SAVEPOINT trx' + tx.id, []]);
                 } catch (ex) {
                     me.Log('pushTransaction.executeTransaction error: ' + JSON.stringify(ex));
                     throw ex;
                 }
-            }
+            };
 
             connectionSuccess({ connectionId: parentTransaction.connectionId });
         } catch (ex) {
@@ -180,17 +180,17 @@ SqlTransaction.prototype.pushTransaction = function(tx, cb, onError, onSuccess, 
         params: []
     });
 
-    this.Log('pushTransaction, transactionStarted: ' + this.transactionStarted + ', statementsQueue.length: ' + this.statementsQueue.length);
+    //this.Log('pushTransaction, transactionStarted: ' + this.transactionStarted + ', statementsQueue.length: ' + this.statementsQueue.length);
 
     if (this.transactionStarted === false && this.statementsQueue.length === 1) {
         this.transactionStarted = true;
         var taskForRun = this.statementsQueue.shift();
         taskForRun.task.apply(this, taskForRun.params);
     }
-}
+};
 
 SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) {
-    this.Log('executeSql, sql: ' + sql);
+    //this.Log('executeSql, sql: ' + sql);
     // BUG: We can loose a statement here if DB processing works faster than next executeSql call - in this case transaction will be finalized
     this.statementsQueue.push({
         task: this.executeSqlInternal,
@@ -200,7 +200,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
     if (this.transactionStarted === false && this.statementsQueue.length === 1) {       
         this.transactionStarted = true;
         var taskForRun = this.statementsQueue.shift();
-        this.Log('executeSql, running task');
+        //this.Log('executeSql, running task');
         try {
             taskForRun.task.apply(this, taskForRun.params);
         } catch (e) {
@@ -214,10 +214,10 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
             this.statementCompleted();
         }        
     }
-}
+};
 
 SqlTransaction.prototype.executeSqlInternal = function(sql, params, onSuccess, onError) {
-    this.Log('executeSqlInternal');
+    //this.Log('executeSqlInternal');
 
     if (!sql) {
         this.Log('executeSqlInternal, ERROR: sql query can\'t be null or empty');
@@ -242,7 +242,7 @@ SqlTransaction.prototype.executeSqlInternal = function(sql, params, onSuccess, o
     this.params = params || [];
 
     this.successCallback = function (res) {
-        me.Log('executeSqlInternal, successCallback, res: ' + JSON.stringify(res));
+        //me.Log('executeSqlInternal, successCallback, res: ' + JSON.stringify(res));
         // add missing .item() method as per http://www.w3.org/TR/webdatabase/#sqlresultset
         res.rows.item = function(index) {
             if (index < 0 || index >= res.rows.length) {
@@ -281,12 +281,12 @@ SqlTransaction.prototype.executeSqlInternal = function(sql, params, onSuccess, o
             }
         }
 
-        me.Log('executeSqlInternal, successCallback FINISH');
+        //me.Log('executeSqlInternal, successCallback FINISH');
         me.statementCompleted();
     };
 
     this.errorCallback = function (error) {
-        me.Log('executeSqlInternal, errorCallback');
+        //me.Log('executeSqlInternal, errorCallback');
         if (onError) {
             try {
                 rollbackRequired = onError(me, error);
@@ -300,13 +300,13 @@ SqlTransaction.prototype.executeSqlInternal = function(sql, params, onSuccess, o
         me.lastError = error;
         me.errorOccured = rollbackRequired;
 
-        me.Log('executeSqlInternal, errorCallback FINISH');
+        //me.Log('executeSqlInternal, errorCallback FINISH');
         me.statementCompleted();
     };
 
     function internalSuccess(res) {
         try {
-            me.Log('executeSqlInternal, internalSuccess');
+            //me.Log('executeSqlInternal, internalSuccess');
             me.successCallback(res);
         } catch (e) {
             me.Log('executeSqlInternal, internalSuccess callback exception: ' + JSON.stringify(e));
@@ -325,7 +325,7 @@ SqlTransaction.prototype.executeSqlInternal = function(sql, params, onSuccess, o
     }
 
     try {
-        me.Log('executeSqlInternal, going to executeSql: ' + me.sql);
+        //me.Log('executeSqlInternal, going to executeSql: ' + me.sql);
         exec(internalSuccess, internalError, "WebSql", "executeSql", [this.connectionId, this.sql, this.params]);
     } catch (ex) {
         me.Log('executeSqlInternal, executeSql error: ' + JSON.stringify(ex));

@@ -8,19 +8,26 @@ var exec = require('cordova/exec'),
 // http://www.w3.org/TR/webdatabase/#sqltransaction
 var SqlTransaction = function (readOnly) {
     this.readOnly = readOnly;
+    //this.Log('ctor');
+};
+
+SqlTransaction.prototype.Log = function (text) {
+    console.log('[SqlTransaction] id: ' + this.id + ', connectionId: ' + this.connectionId + '. | ' + text);
 };
 
 SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) {
-
     if (!sql) {
+        this.Log('executeSql, ERROR: sql query can\'t be null or empty');
         throw new Error('sql query can\'t be null or empty');
     }
 
     if (typeof (this.connectionId) == 'undefined' || this.connectionId <= 0) {
+        this.Log('executeSql, ERROR: Connection is not set');
         throw new Error('Connection is not set');
     }
 
     if (this.readOnly && WRITE_OPS_REGEX.test(sql)) {
+        this.Log('executeSql, ERROR: Read-only transaction can\'t include write operations');
         throw new Error('Read-only transaction can\'t include write operations');
     }
 
@@ -60,7 +67,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
                     try {
                         rollbackRequired = onError(me, e);
                     } catch (errCbEx) {
-                        console.log("Error occured while executing error callback: " + errCbEx + "; query: " + this.sql);
+                        me.Log("Error occured while executing error callback: " + errCbEx + "; query: " + me.sql);
                         rollbackRequired = true;
                     }                    
                 } else {
@@ -77,7 +84,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
             try {
                 rollbackRequired = onError(me, error);
             } catch (errCbEx) {
-                console.log("Error occured while executing error callback: " + errCbEx);
+                me.Log("Error occured while executing error callback: " + errCbEx);
                 rollbackRequired = true;
             }
         } else {
@@ -93,7 +100,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
     }
 
     if (rollbackRequired) {
-        console.log("Error occured while executing sql: " + this.sql + '. Error: ' + lastError);
+        me.Log("Error occured while executing sql: " + me.sql + '. Error: ' + lastError);
         throw lastError;
     }
 };
