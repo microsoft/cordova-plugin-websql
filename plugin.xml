@@ -16,7 +16,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     <issue>https://github.com/msopentech/cordova-plugin-websql/issues</issue>
 
     <platform name="wp8">
-        <js-module src="www/wp8/WebSQL.js" name="WebSQL">
+        <js-module src="www/WebSQL.js" name="WebSQL">
             <merges target="window" />
         </js-module>
         <js-module src="www/wp8/Database.js" name="Database" />
@@ -33,35 +33,35 @@ xmlns:android="http://schemas.android.com/apk/res/android"
     </platform>
 
     <platform name="windows8">
-        <js-module src="www/windows8/WebSQL.js" name="WebSQL">
+        <js-module src="www/WebSQL.js" name="WebSQL">
             <merges target="window" />
         </js-module>
-        <js-module src="www/windows8/Database.js" name="Database" />
-        <js-module src="www/windows8/SqlTransaction.js" name="SqlTransaction" />
+        <js-module src="www/windows/Database.js" name="Database" />
+        <js-module src="www/windows/SqlTransaction.js" name="SqlTransaction" />
 
-        <framework src="src/windows8/SQLite.Proxy.winmd" custom="true"/>
-        <framework src="src/windows8/Community.CsharpSqlite.WinRT.dll" custom="true"/>
-        <framework src="src/windows8/Community.CsharpSqlite.SQLiteClient.WinRT.dll" custom="true"/>
-        <framework src="src/windows8/System.Data.Ersatz.WinRT.dll" custom="true"/>
+        <framework src="src/windows/SQLite.Proxy.winmd" custom="true"/>
+        <framework src="src/windows/Community.CsharpSqlite.WinRT.dll" custom="true"/>
+        <framework src="src/windows/Community.CsharpSqlite.SQLiteClient.WinRT.dll" custom="true"/>
+        <framework src="src/windows/System.Data.Ersatz.WinRT.dll" custom="true"/>
 
-        <js-module src="src/windows8/WebSqlProxy.js" name="WebSqlProxy">
+        <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
             <merges target="" />
         </js-module>
     </platform>
 
     <platform name="windows">  
-        <js-module src="www/windows8/WebSQL.js" name="WebSQL">
+        <js-module src="www/WebSQL.js" name="WebSQL">
             <merges target="window" />
         </js-module>
-        <js-module src="www/windows8/Database.js" name="Database" />
-        <js-module src="www/windows8/SqlTransaction.js" name="SqlTransaction" />
+        <js-module src="www/windows/Database.js" name="Database" />
+        <js-module src="www/windows/SqlTransaction.js" name="SqlTransaction" />
 
-        <framework src="src/windows8/SQLite.Proxy.winmd" custom="true"/>
-        <framework src="src/windows8/Community.CsharpSqlite.WinRT.dll" custom="true"/>
-        <framework src="src/windows8/Community.CsharpSqlite.SQLiteClient.WinRT.dll" custom="true"/>
-        <framework src="src/windows8/System.Data.Ersatz.WinRT.dll" custom="true"/>
+        <framework src="src/windows/SQLite.Proxy.winmd" custom="true"/>
+        <framework src="src/windows/Community.CsharpSqlite.WinRT.dll" custom="true"/>
+        <framework src="src/windows/Community.CsharpSqlite.SQLiteClient.WinRT.dll" custom="true"/>
+        <framework src="src/windows/System.Data.Ersatz.WinRT.dll" custom="true"/>
 
-        <js-module src="src/windows8/WebSqlProxy.js" name="WebSqlProxy">
+        <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
             <merges target="" />
         </js-module>
     </platform>
