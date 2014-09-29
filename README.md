@@ -1,31 +1,31 @@
 WebSQL plugin for Apache Cordova
 ==================================
-Adds WebSQL functionality as Apache Cordova Plugin implemented on top of Csharp-Sqlite library. Support of Windows 8.0, Windows 8.1, Windows Phone 8.0 and Windows Phone 8.1.
+Adds WebSQL functionality as Apache Cordova Plugin implemented on top of [Csharp-Sqlite library](https://code.google.com/p/csharp-sqlite/). Support of Windows 8.0, Windows 8.1, Windows Phone 8.0 and Windows Phone 8.1.
 
 ### Sample usage ###
 
 Plugin follows [WebDatabase](http://www.w3.org/TR/webdatabase/) specification, no special changes are required. The following sample code creates `todo` table (if not exist) and adds new record. Complete example is available [here](https://github.com/MSOpenTech/cordova-plugin-websql/tree/master/test).
+```javascript
+var dbSize = 5 * 1024 * 1024; // 5MB
 
-    var dbSize = 5 * 1024 * 1024; // 5MB
+var db = openDatabase("Todo", "", "Todo manager", dbSize, function() {
+    console.log('db successfully opened or created');
+});
 
-    var db = openDatabase("Todo", "", "Todo manager", dbSize, function() {
-        console.log('db successfully opened or created');
-    });
+db.transaction(function (tx) {
+    tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on TEXT)",
+        [], onSuccess, onError);
+    tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", ['my todo item', new Date().toUTCString()], onSuccess, onError);
+});
 
-    db.transaction(function (tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on TEXT)",
-            [], onSuccess, onError);
-        tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", ['my todo item', new Date().toUTCString()], onSuccess, onError);
-    });
+function onSuccess(transaction, resultSet) {
+    console.log('Query completed: ' + JSON.stringify(resultSet));
+}
 
-    function onSuccess(transaction, resultSet) {
-        console.log('Query completed: ' + JSON.stringify(resultSet));
-    }
-
-    function onError(transaction, error) {
-        console.log('Query failed: ' + error.message);
-    }
-
+function onError(transaction, error) {
+    console.log('Query failed: ' + error.message);
+}
+```
 ### Installation Instructions ###
 
 Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html) 3.x compliant.
@@ -53,28 +53,30 @@ Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_
 To learn more, read [Apache Cordova CLI Usage Guide](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html).
 
 ### Quirks ###
- * The db version, display name, and size parameter values are not supported and will be ignored.
- * To use neted transactions you will need to pass parent transaction like this:
-```javascript
-var db = openDatabase('test1.db', '1.0', 'testLongTransaction', 2 * 1024);
-db.transaction(function (tx1) {
-    tx1.executeSql('DROP TABLE IF EXISTS foo');
-    tx1.executeSql('CREATE TABLE IF NOT EXISTS foo (id unique, text)');
-    ...
-    db.transaction(function (tx2) {
-        tx2.executeSql('INSERT INTO foo (id, text) VALUES (1, "foobar")');
-    }, null, null, null, null, false, tx1);
-    ...
-}, null, null);
-```
-`tx1` passed as the last argument in the nested `db.transaction` refers to the parent transaction.
-`null, null, null, null, false, tx1` arguments are:
-* the db.transaction error callback,
-* the db.transaction success callback,
-* preflight operation callback,
-* postflight operation callback,
-* readOnly flag,
-* parent transaction - respectively.
+* The db version, display name, and size parameter values are not supported and will be ignored.
+ 
+* To use nested transactions you will need to pass parent transaction like this:
+    ```javascript
+    var db = openDatabase('test1.db', '1.0', 'testLongTransaction', 2 * 1024);
+    db.transaction(function (tx1) {
+        tx1.executeSql('DROP TABLE IF EXISTS foo');
+        tx1.executeSql('CREATE TABLE IF NOT EXISTS foo (id unique, text)');
+        ...
+        db.transaction(function (tx2) {
+            tx2.executeSql('INSERT INTO foo (id, text) VALUES (1, "foobar")');
+        }, null, null, null, null, false, tx1);
+        ...
+    }, null, null);
+    ```
+    `tx1` passed as the last argument in the nested `db.transaction` refers to the parent transaction.
+    
+    Other arguments (`null, null, null, null, false, tx1`) are:
+    * the db.transaction error callback,
+    * the db.transaction success callback,
+    * preflight operation callback,
+    * postflight operation callback,
+    * readOnly flag,
+    * parent transaction - respectively.
 
 ### Copyrights ###
 Copyright (c) Microsoft Open Technologies, Inc. All Rights Reserved.
