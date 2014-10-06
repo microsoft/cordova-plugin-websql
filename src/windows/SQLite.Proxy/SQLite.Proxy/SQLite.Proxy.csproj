@@ -103,16 +103,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Community.CsharpSqlite.SQLiteClient.WinRT, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Community.CsharpSqlite.SQLiteClient.WinRT">
       <HintPath>Lib\Community.CsharpSqlite.SQLiteClient.WinRT.dll</HintPath>
     </Reference>
-    <Reference Include="Community.CsharpSqlite.WinRT, Version=3.7.7.1, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Community.CsharpSqlite.WinRT">
       <HintPath>Lib\Community.CsharpSqlite.WinRT.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.Ersatz.WinRT, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Data.Ersatz.WinRT">
       <HintPath>Lib\System.Data.Ersatz.WinRT.dll</HintPath>
     </Reference>
   </ItemGroup>
