@@ -45,7 +45,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         <framework src="src/windows/System.Data.Ersatz.WinRT.dll" custom="true"/>
 
         <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
-            <merges target="" />
+            <runs />
         </js-module>
     </platform>
 
@@ -62,7 +62,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         <framework src="src/windows/System.Data.Ersatz.WinRT.dll" custom="true"/>
 
         <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
-            <merges target="" />
+            <runs />
         </js-module>
     </platform>
 </plugin>
