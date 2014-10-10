@@ -77,6 +77,11 @@ To learn more, read [Apache Cordova CLI Usage Guide](http://cordova.apache.org/d
     * postflight operation callback,
     * readOnly flag,
     * parent transaction - respectively.
+    
+* To enable logging use:
+    ```javascript
+    window.__webSqlDebugModeOn = true;
+    ```
 
 ### Copyrights ###
 Copyright (c) Microsoft Open Technologies, Inc. All Rights Reserved.
