@@ -1,31 +1,31 @@
 WebSQL plugin for Apache Cordova
 ==================================
-Adds WebSQL functionality as Apache Cordova Plugin implemented on top of native SQLite database. Support of Windows Phone8 and Windows8.
+Adds WebSQL functionality as Apache Cordova Plugin implemented on top of [Csharp-Sqlite library](https://code.google.com/p/csharp-sqlite/). Support of Windows 8.0, Windows 8.1, Windows Phone 8.0 and Windows Phone 8.1.
 
 ### Sample usage ###
 
 Plugin follows [WebDatabase](http://www.w3.org/TR/webdatabase/) specification, no special changes are required. The following sample code creates `todo` table (if not exist) and adds new record. Complete example is available [here](https://github.com/MSOpenTech/cordova-plugin-websql/tree/master/test).
+```javascript
+var dbSize = 5 * 1024 * 1024; // 5MB
 
-    var dbSize = 5 * 1024 * 1024; // 5MB
+var db = openDatabase("Todo", "", "Todo manager", dbSize, function() {
+    console.log('db successfully opened or created');
+});
 
-    var db = openDatabase("Todo", "", "Todo manager", dbSize, function() {
-        console.log('db successfully opened or created');
-    });
+db.transaction(function (tx) {
+    tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on TEXT)",
+        [], onSuccess, onError);
+    tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", ['my todo item', new Date().toUTCString()], onSuccess, onError);
+});
 
-    db.transaction(function (tx) {
-        tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on DATETIME)",
-            [], onSuccess, onError);
-        tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", ['my todo item', new Date()], onSuccess, onError);
-    });
+function onSuccess(transaction, resultSet) {
+    console.log('Query completed: ' + JSON.stringify(resultSet));
+}
 
-    function onSuccess(transaction, resultSet) {
-        console.log('Query completed: ' + JSON.stringify(resultSet));
-    }
-
-    function onError(transaction, error) {
-        console.log('Query failed: ' + error.message);
-    }
-
+function onError(transaction, error) {
+    console.log('Query failed: ' + error.message);
+}
+```
 ### Installation Instructions ###
 
 Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html) 3.x compliant.
@@ -38,8 +38,8 @@ Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_
 
         cordova create sampleApp
         cd sampleApp
-        cordova platform add windows8
-        cordova platform add wp8
+        cordova platform add windows <- support of Windows 8.0, Windows 8.1 and Windows Phone 8.1
+        cordova platform add wp8 <- support of Windows Phone 8.0
 
 3. Add WebSql plugin to your project:
 
@@ -47,19 +47,41 @@ Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_
 
 4. Build and run, for example:
 
-        cordova build windows8
-        cordova emulate windows8
+        cordova build wp8
+        cordova emulate wp8
 
 To learn more, read [Apache Cordova CLI Usage Guide](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html).
 
-### Prerequisites ###
-
-In order to build plugin for __Windows8__ target platform, you must manually install the [SQLite for Windows Runtime Extension SDK v3.8.2](http://sqlite.org/2013/sqlite-winrt-3080200.vsix). Note: some browsers will replace the extension of the file from .vsix to .zip when downloading it. If that is the case for you, change the extension of the file back from .zip to .vsix before double-clicking to install.
-
 ### Quirks ###
- * The db version, display name, and size parameter values are not supported and will be ignored
- * rowsAffected and insertId properties of sqlResultSet are not supported http://www.w3.org/TR/webdatabase/#sqlresultset
- * Every sql call is performed in its own transaction; so rollback for nested transactions is not supported.
+* The db version, display name, and size parameter values are not supported and will be ignored.
+ 
+* To use nested transactions you will need to pass parent transaction like this:
+    ```javascript
+    var db = openDatabase('test1.db', '1.0', 'testLongTransaction', 2 * 1024);
+    db.transaction(function (tx1) {
+        tx1.executeSql('DROP TABLE IF EXISTS foo');
+        tx1.executeSql('CREATE TABLE IF NOT EXISTS foo (id unique, text)');
+        ...
+        db.transaction(function (tx2) {
+            tx2.executeSql('INSERT INTO foo (id, text) VALUES (1, "foobar")');
+        }, null, null, null, null, false, tx1);
+        ...
+    }, null, null);
+    ```
+    `tx1` passed as the last argument in the nested `db.transaction` refers to the parent transaction.
+    
+    Other arguments (`null, null, null, null, false, tx1`) are:
+    * the db.transaction error callback,
+    * the db.transaction success callback,
+    * preflight operation callback,
+    * postflight operation callback,
+    * readOnly flag,
+    * parent transaction - respectively.
+
+* To enable logging use:
+    ```javascript
+    window.__webSqlDebugModeOn = true;
+    ```
 
 ### Copyrights ###
 Copyright (c) Microsoft Open Technologies, Inc. All Rights Reserved.

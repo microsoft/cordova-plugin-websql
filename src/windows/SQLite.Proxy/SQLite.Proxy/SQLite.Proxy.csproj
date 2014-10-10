@@ -1,13 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\SQLitePCL.3.8.2.0\build\netcore45\SQLitePCL.props" Condition="Exists('..\packages\SQLitePCL.3.8.2.0\build\netcore45\SQLitePCL.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{E602BB9A-2446-4DF4-8B31-3E68A00277DB}</ProjectGuid>
+    <ProjectGuid>{58D0FEBD-0844-4360-8085-8C5DE493E092}</ProjectGuid>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SQLite.Proxy</RootNamespace>
@@ -104,41 +103,24 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="SQLitePCL">
-      <HintPath>..\SQLitePCL.dll</HintPath>
+    <Reference Include="Community.CsharpSqlite.SQLiteClient.WinRT">
+      <HintPath>Lib\Community.CsharpSqlite.SQLiteClient.WinRT.dll</HintPath>
     </Reference>
-    <Reference Include="SQLitePCL.Ext">
-      <HintPath>..\SQLitePCL.Ext.dll</HintPath>
+    <Reference Include="Community.CsharpSqlite.WinRT">
+      <HintPath>Lib\Community.CsharpSqlite.WinRT.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.Ersatz.WinRT">
+      <HintPath>Lib\System.Data.Ersatz.WinRT.dll</HintPath>
     </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '11.0' ">
     <VisualStudioVersion>11.0</VisualStudioVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'x64|AnyCPU'">
-    <OutputPath>bin\x64\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'x64|ARM'">
-    <OutputPath>bin\ARM\x64\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'x64|x64'">
-    <OutputPath>bin\x64\x64\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'x64|x86'">
-    <OutputPath>bin\x86\x64\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ARM|AnyCPU'">
-    <OutputPath>bin\ARM\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ARM|ARM'">
-    <OutputPath>bin\ARM\ARM\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ARM|x64'">
-    <OutputPath>bin\x64\ARM\</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ARM|x86'">
-    <OutputPath>bin\x86\ARM\</OutputPath>
-  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /Y /Q $(ProjectDir)Lib\* $(ProjectDir)..\..
+xcopy /Y /Q $(TargetDir)$(TargetFileName) $(ProjectDir)..\..</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
