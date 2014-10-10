@@ -18,14 +18,18 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
 
     this.lastTransactionId = 0;
 
-    console.log('new Database(); name = ' + name);
+    this.Log('new Database(); name = ' + name);
+
+    var that = this;
+
     exec(creationCallback, function (err) {
-        console.log('Database.open() err = ' + JSON.stringify(err));
+        that.Log('Database.open() err = ' + JSON.stringify(err));
     }, "WebSql", "open", [this.name]);
 };
 
 Database.prototype.Log = function (text) {
-    console.log('[Database] name: ' + this.name + ', lastTransactionId: ' + this.lastTransactionId + '. | ' + text);
+    if(window.__webSqlDebugModeOn === true)
+        console.log('[Database] name: ' + this.name + ', lastTransactionId: ' + this.lastTransactionId + '. | ' + text);
 };
 
 Database.prototype.transaction = function (cb, onError, onSuccess, preflight, postflight, readOnly, parentTransaction) {

@@ -91,7 +91,7 @@ var app = {
     },
 
     testEvents: function() {
-        var db = openDatabase('foo', '1.0', 'foo', 2 * 1024);
+        var db = openDatabase('testEvents.db', '1.0', 'testEvents', 2 * 1024);
         db.transaction (
             function (tx) {
                 console.log('transaction 1');
@@ -129,23 +129,9 @@ var app = {
             });        
     },
 
-    testEventsDrop: function () {
-        var db = openDatabase('foo', '1.0', 'foo', 2 * 1024);
-        db.transaction(
-            function (tx) {
-                console.log('transaction 1');
-                tx.executeSql('CREATE TABLE IF NOT EXISTS foo (id unique, text)');
-                tx.executeSql('DROP TABLE IF EXISTS foo');
-            },
-            app.dbError,
-            function () {              
-                    console.log('DROP - Ok');               
-            });
-    },
-
     testJSONBlob: function () {
         var arr = [{name: 'Ivan', title: 'Mr.', age: 25}, 'some string', 42, [1, 2, 3], ['a', 'b', 1, 10], [[1, 2, 3], ['a', 'b', 'c']]];
-        var db = openDatabase('blob', '1.0', 'blob', 2 * 1024);
+        var db = openDatabase('testJSONBlob.db', '1.0', 'testJSONBlob', 2 * 1024);
         db.transaction(function (tx) {
             tx.executeSql('DROP TABLE IF EXISTS blob');
             tx.executeSql('CREATE TABLE IF NOT EXISTS blob (id unique, text)');
@@ -216,7 +202,7 @@ var app = {
         }
 
         function runTest() {
-            database = openDatabase("ErrorCallbackDatabase", "1.0", "Test for error callback", 1);
+            database = openDatabase("testRollbacksAfterFailures.db", "1.0", "testRollbacksAfterFailures", 1);
 
             database.transaction(function(tx) {
                 tx.executeSql("CREATE TABLE IF NOT EXISTS ErrorCallbackTest (someValue)", []);
@@ -299,7 +285,7 @@ var app = {
     },
 
     testPrelightPostflight: function() {
-        var db = openDatabase('test.db', '1.0', 'testLongTransaction', 2 * 1024);
+        var db = openDatabase('testPrelightPostflight.db', '1.0', 'testPrelightPostflight', 2 * 1024);
         db.transaction(function (tx) {
             tx.executeSql('DROP TABLE IF EXISTS foo');
             tx.executeSql('CREATE TABLE IF NOT EXISTS foo (id unique, text)');
@@ -316,7 +302,7 @@ var app = {
     },
 
     testNestedTransaction: function() {
-        var db = openDatabase('test.db', '1.0', 'testLongTransaction', 2 * 1024);
+        var db = openDatabase('testNestedTransaction.db', '1.0', 'testNestedTransaction', 2 * 1024);
         db.transaction(function(tx) {
             tx.executeSql('DROP TABLE IF EXISTS foo', [], function() {
                 document.querySelector('#status').innerHTML += '<p>table dropped</p>';
@@ -338,6 +324,7 @@ var app = {
             }, null, null, false, tx);
             tx.executeSql('SELECT * FROM foo', [], function(tx, res) {
                 document.querySelector('#status').innerHTML += '<p>' + JSON.stringify(res.rows) + '</p>';
+                document.querySelector('#status').innerHTML += '<p>Expected 1 row</p>';
             });
         });
     },

@@ -20,14 +20,18 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
     this.tasksQueue = [];
     this.tasksRunned = false;
 
-    console.log('new Database(); name = ' + name);
+    this.Log('new Database(); name = ' + name);
+
+    var that = this;
+
     exec(creationCallback, function (err) {
-        console.log('Database.open() err = ' + JSON.stringify(err));
+        that.Log('Database.open() err = ' + JSON.stringify(err));
     }, "WebSql", "open", [this.name]);
 };
 
 Database.prototype.Log = function (text) {
-    console.log('[Database] name: ' + this.name + ', tasksQueue.length: ' + this.tasksQueue.length + '. | ' + text);
+    if(window.__webSqlDebugModeOn === true)
+        console.log('[Database] name: ' + this.name + ', tasksQueue.length: ' + this.tasksQueue.length + '. | ' + text);
 };
 
 Database.prototype.guid = (function () {

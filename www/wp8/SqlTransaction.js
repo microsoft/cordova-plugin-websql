@@ -22,7 +22,8 @@ var SqlTransaction = function (onError, onSuccess, postflight, readOnly, transac
 };
 
 SqlTransaction.prototype.Log = function (text) {
-    console.log('[SqlTransaction] id: ' + this.id + ', connectionId: ' + this.connectionId + ', errorOccured: ' + this.errorOccured + '; statementsQueue.length = ' + this.statementsQueue.length + '. | ' + text);
+    if(window.__webSqlDebugModeOn === true)
+        console.log('[SqlTransaction] id: ' + this.id + ', connectionId: ' + this.connectionId + ', errorOccured: ' + this.errorOccured + '; statementsQueue.length = ' + this.statementsQueue.length + '. | ' + text);
 };
 
 SqlTransaction.prototype.statementCompleted = function () {

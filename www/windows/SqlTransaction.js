@@ -12,7 +12,8 @@ var SqlTransaction = function (readOnly) {
 };
 
 SqlTransaction.prototype.Log = function (text) {
-    console.log('[SqlTransaction] id: ' + this.id + ', connectionId: ' + this.connectionId + '. | ' + text);
+    if(window.__webSqlDebugModeOn === true)
+        console.log('[SqlTransaction] id: ' + this.id + ', connectionId: ' + this.connectionId + '. | ' + text);
 };
 
 SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) {
