@@ -61,7 +61,7 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
 
                     //me.Log('transaction.run.connectionSuccess, res.connectionId: ' + res.connectionId);
                     tx.connectionId = res.connectionId;
-                }, null, "WebSql", "connect", []);
+                }, null, "WebSql", "connect", [me.name]);
             } else {
                 tx.connectionId = parentTransaction.connectionId;
             }

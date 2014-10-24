@@ -100,7 +100,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
         errorCallback(ex);
     }
 
-    if (rollbackRequired) {
+    if (rollbackRequired !== false) {
         me.Log("Error occured while executing sql: " + me.sql + '. Error: ' + lastError);
         throw lastError;
     }

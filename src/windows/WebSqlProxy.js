@@ -3,12 +3,18 @@
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
  */
 
+var localFolderPath = Windows.Storage.ApplicationData.current.localFolder.path;
+var pathSeparator = "\\";
+function generateDbPath(dbFileName) {
+    return localFolderPath + pathSeparator + dbFileName;
+}
+
 module.exports = {
     db: null,
 
     open: function (success, fail, args) {
         try {
-            this.db = Windows.Storage.ApplicationData.current.localFolder.path + "\\" + args[0];
+            this.db = generateDbPath(args[0]);
             success();
         } catch(ex) {
             fail(ex);
@@ -44,8 +50,11 @@ module.exports = {
         }
     },
 
-    connect: function(success, fail) {
+    connect: function(success, fail, args) {
         try {
+            var dbName = args.shift();
+            this.db = generateDbPath(dbName);
+
             var res = SQLite.Proxy.SQLiteProxy.connectToDb(this.db);
             res = JSON.parse(res);
 
