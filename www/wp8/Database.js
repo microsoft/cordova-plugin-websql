@@ -24,7 +24,11 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
 
     var that = this;
 
-    exec(creationCallback, function (err) {
+    function creationCallbackAsyncWrapper() {
+        setTimeout(creationCallback, 0);
+    }
+
+    exec(creationCallbackAsyncWrapper, function (err) {
         that.Log('Database.open() err = ' + JSON.stringify(err));
     }, "WebSql", "open", [this.name]);
 };

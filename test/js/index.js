@@ -329,6 +329,37 @@ var app = {
         });
     },
 
+    openDatabaseMultipleTimes: function () {
+        var dbSize = 5 * 1024 * 1024; // 5MB
+        // open database        
+        app.tempDb1 = openDatabase("TodoMultiple", "", "Todo manager", dbSize, function() {
+            console.log('db successfully opened or created #1');
+            app.tempDb1.transaction(function (tx) {
+                tx.executeSql("DROP TABLE IF EXISTS todo", [], null, app.onError);
+                tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on TEXT)", [],
+                    null, app.onError);
+                var text = "test1";
+                var ts = new Date().toUTCString();
+                tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", [text, ts], null, app.onError);
+            }, app.dbError, function() {
+                app.tempDb2 = openDatabase("TodoMultiple", "", "Todo manager", dbSize, function () {
+                    console.log('db successfully opened or created #2');
+                    app.tempDb2.transaction(function (tx) {
+                        var text = "test2";
+                        var ts = new Date().toUTCString();
+                        tx.executeSql("INSERT INTO todo(todo, added_on) VALUES (?,?)", [text, ts], null, app.onError);
+
+                        console.log('there should be 2 rows now:');
+                        tx.executeSql("SELECT * FROM todo", [], function (tx, res) {
+                            console.log(res.rows.length);
+                            document.querySelector('#status').innerHTML += '<p>found rows (should be 2): ' + res.rows.length + '</p>';
+                        }, app.onError);
+                    });
+                });
+            });
+        });
+    },
+
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
@@ -348,6 +379,7 @@ var app = {
         document.getElementById('bthTestLongTransactions').addEventListener('click', this.testLongTransactions);
         document.getElementById('btnTestPrelightPostflight').addEventListener('click', this.testPrelightPostflight);
         document.getElementById('btnTestNestedTransaction').addEventListener('click', this.testNestedTransaction);
+        document.getElementById('btnOpenDbMul').addEventListener('click', this.openDatabaseMultipleTimes);
     },
     // deviceready Event Handler
     //
