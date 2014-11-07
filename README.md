@@ -52,6 +52,41 @@ Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_
 
 To learn more, read [Apache Cordova CLI Usage Guide](http://cordova.apache.org/docs/en/edge/guide_cli_index.md.html).
 
+### Pre-populated DBs support ###
+You can copy a prepared DB file to the App' LocalFolder on the first run, for example (in terms of the sample app):
+```javascript
+initialize: function () {
+    WinJS.Application.local.exists('Todo').done(
+        function (found) {
+            if (!found) {
+                return copyStartData('Todo');
+            }
+        }
+    );
+
+    function copyStartData(copyfile) {
+        return Windows.ApplicationModel.Package.current.installedLocation.getFolderAsync('www')
+        .then(function (www) {
+            return www.getFolderAsync('data')
+            .then(function (data) {
+                    return data.getFileAsync(copyfile).then(
+                        function (file) {
+                            if (file) {
+                                return file.copyAsync(WinJS.Application.local.folder);
+                            }
+                        });
+            });
+        });
+    }
+
+    ...
+},
+```
+
+The snippet copies `www/data/Todo` pre-populated DB to the App' local folder if it did not exist.
+
+Based on [this StackOverflow question](http://stackoverflow.com/questions/15068295/deployment-of-localstate-folder).
+
 ### Quirks ###
 * The db version, display name, and size parameter values are not supported and will be ignored.
  
