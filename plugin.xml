@@ -56,10 +56,8 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         <js-module src="www/windows/Database.js" name="Database" />
         <js-module src="www/windows/SqlTransaction.js" name="SqlTransaction" />
 
-        <framework src="src/windows/SQLite.Proxy.winmd" custom="true"/>
-        <framework src="src/windows/Community.CsharpSqlite.WinRT.dll" custom="true"/>
-        <framework src="src/windows/Community.CsharpSqlite.SQLiteClient.WinRT.dll" custom="true"/>
-        <framework src="src/windows/System.Data.Ersatz.WinRT.dll" custom="true"/>
+        <framework src="src/windows/SQLite.Proxy/SQLite.Proxy/SQLite.Proxy.csproj" 
+            custom="true" type="projectReference" target="windows" />
 
         <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
             <runs />

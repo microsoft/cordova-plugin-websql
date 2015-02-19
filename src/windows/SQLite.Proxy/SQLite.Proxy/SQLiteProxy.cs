@@ -31,6 +31,22 @@ namespace SQLite.Proxy
                     _dbConnections.Add(newId, connection);
                     result.Id = newId;
 
+                    String[] emptyParams = { };
+                    Object[] tempQuery = { "PRAGMA temp_store=MEMORY;", emptyParams };
+                    executeSql(newId, tempQuery);
+
+                    Object[] pageQuery = { "PRAGMA page_size=4096;", emptyParams };
+                    executeSql(newId, pageQuery);
+
+                    Object[] synchronousQuery = { "PRAGMA synchronous=off ;", emptyParams };
+                    executeSql(newId, synchronousQuery);
+
+                    Object[] ignoreCheckQuery = { "PRAGMA ignore_check_constraints=on ;", emptyParams };
+                    executeSql(newId, ignoreCheckQuery);
+
+                    Object[] journalModeQuery = { "PRAGMA journal_mode=OFF;", emptyParams };
+                    executeSql(newId, journalModeQuery);
+
                     break;
                 }
                 catch (Exception ex)

@@ -7,6 +7,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{58D0FEBD-0844-4360-8085-8C5DE493E092}</ProjectGuid>
+    <ProjectName>SQLite.Proxy</ProjectName>
     <OutputType>winmdobj</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SQLite.Proxy</RootNamespace>
