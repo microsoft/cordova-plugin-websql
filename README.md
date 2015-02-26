@@ -88,8 +88,10 @@ The snippet copies `www/data/Todo` pre-populated DB to the App' local folder if 
 Based on [this StackOverflow question](http://stackoverflow.com/questions/15068295/deployment-of-localstate-folder).
 
 ### Quirks ###
-* The db version, display name, and size parameter values are not supported and will be ignored.
- 
+* The display name, and size parameter values are not supported and will be ignored.
+
+* db version parameter to `openDatabase` and `changeVersion` method are supported only on windows platform. Due to SQLite limitations, version number should be an integer value or integer's string representation.
+
 * To use nested transactions you will need to pass parent transaction like this:
     ```javascript
     var db = openDatabase('test1.db', '1.0', 'testLongTransaction', 2 * 1024);

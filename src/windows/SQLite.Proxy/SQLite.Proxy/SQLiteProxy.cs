@@ -53,6 +53,59 @@ namespace SQLite.Proxy
             return Serialize(typeof(ConnectionInfo), result);
         }
 
+        public static string getVersion(string dbname)
+        {
+            var result = new object();
+
+            for (var i = 0; i < _retriesCount; i++)
+            {
+                try
+                {
+                    var connection = new SqliteConnection(string.Format("Version=3,uri=file:{0}", dbname));
+                    connection.Open();
+
+                    result = new SqliteCommand("PRAGMA user_version", connection).ExecuteScalar();
+
+                    connection.Close();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (i == _retriesCount - 1)
+                        return Serialize(typeof(InvocationError), new InvocationError(ex));
+                }
+            }
+
+            return Serialize(result.GetType(), result);
+        }
+
+        public static string setVersion(string dbname, int version)
+        {
+            var result = -1;
+
+            for (int i = 0; i < _retriesCount; i++)
+            {
+                try
+                {
+                    var connection = new SqliteConnection(string.Format("Version=3,uri=file:{0}", dbname));
+                    connection.Open();
+
+                    result = new SqliteCommand(string.Format("PRAGMA user_version={0}", version), connection).ExecuteNonQuery();
+
+                    connection.Close();
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (i == _retriesCount - 1)
+                        return Serialize(typeof(InvocationError), new InvocationError(ex));
+                }
+                return Serialize(result.GetType(), result);
+            }
+
+            return Serialize(typeof(InvocationError), new InvocationError(new SqliteException(-1)));
+        }
+
         public static string Disconnect(long connectionId)
         {
             try

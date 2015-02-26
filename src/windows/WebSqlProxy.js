@@ -1,7 +1,10 @@
-﻿/*
+﻿
+/*
  * Copyright (c) Microsoft Open Technologies, Inc. All Rights Reserved.
  * Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
  */
+
+/*global module, require, SQLite, Windows*/
 
 var localFolderPath = Windows.Storage.ApplicationData.current.localFolder.path;
 var pathSeparator = "\\";
@@ -11,6 +14,51 @@ function generateDbPath(dbFileName) {
 
 module.exports = {
     db: null,
+
+    getVersion: function(success, fail, args) {
+        try {
+            var dbName = args.shift();
+            this.db = generateDbPath(dbName);
+
+            var res = SQLite.Proxy.SQLiteProxy.getVersion(this.db);
+            res = JSON.parse(res);
+
+            if (res && res.message) {
+                fail(res);
+                return;
+            }
+
+            success(res);
+        } catch (ex) {
+            fail(ex);
+        }
+    },
+
+    setVersion: function (success, fail, args) {
+        try {
+            var dbName = args.shift();
+            var version = args.shift();
+
+            this.db = generateDbPath(dbName);
+
+            var res = SQLite.Proxy.SQLiteProxy.setVersion(this.db, version);
+            res = JSON.parse(res);
+
+            if (res && res.message) {
+                fail(res);
+                return;
+            }
+
+            if (res === -1) {
+                fail(res);
+                return;
+            }
+
+            success(res);
+        } catch (ex) {
+            fail(ex);
+        }
+    },
 
     open: function (success, fail, args) {
         try {

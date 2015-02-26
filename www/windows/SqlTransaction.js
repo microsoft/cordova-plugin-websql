@@ -97,7 +97,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
     try {
         exec(this.successCallback, this.errorCallback, "WebSql", "executeSql", [this.connectionId, this.sql, this.params]);
     } catch(ex) {
-        errorCallback(ex);
+        this.errorCallback(ex);
     }
 
     if (rollbackRequired !== false) {
