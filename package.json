@@ -1,0 +1,27 @@
+{
+  "name": "cordova-plugin-websql",
+  "version": "0.0.8",
+  "description": "Cordova Websql Plugin",
+  "cordova": {
+    "id": "cordova-plugin-websql",
+    "platforms": [
+      "wp8",
+      "windows8",
+      "windows"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MSOpenTech/cordova-plugin-websql.git"
+  },
+  "keywords": [
+    "cordova",
+    "websql",
+    "ecosystem:cordova",
+    "cordova-windows8",
+    "cordova-windows",
+    "cordova-wp8"
+  ],
+  "author": "Microsoft Open Technologies Inc",
+  "license": "Apache 2.0"
+}
