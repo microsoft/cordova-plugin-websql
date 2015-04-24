@@ -51,15 +51,17 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
         for (idxRow = 0; idxRow < res.rows.length; idxRow++) {
             var originalRow = res.rows[idxRow],
                 refinedRow = {},
-                idxColumn;
-              
+                idxColumn,
+                hasProp = {}.hasOwnProperty;
+
             res.rows[idxRow] = refinedRow;
 
             for (idxColumn in originalRow) {
+                if (!hasProp.call(originalRow, idxColumn)) continue;
                 refinedRow[originalRow[idxColumn].Key] = originalRow[idxColumn].Value;
-            } 
+            }
         }
-       
+
         if (onSuccess) {
             try {
                 onSuccess(me, res);
@@ -70,7 +72,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
                     } catch (errCbEx) {
                         me.Log("Error occured while executing error callback: " + errCbEx + "; query: " + me.sql);
                         rollbackRequired = true;
-                    }                    
+                    }
                 } else {
                     rollbackRequired = true;
                 }
@@ -93,7 +95,7 @@ SqlTransaction.prototype.executeSql = function(sql, params, onSuccess, onError) 
         }
         lastError = error;
     };
-    
+
     try {
         exec(this.successCallback, this.errorCallback, "WebSql", "executeSql", [this.connectionId, this.sql, this.params]);
     } catch(ex) {
