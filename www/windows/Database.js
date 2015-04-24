@@ -67,7 +67,7 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
 
         if (!failed) {
             // We'll schedule a creation callback invocation only if there is no version mismatch
-            setTimeout(creationCallback.bind(null, that), 0);
+            if(creationCallback) { setTimeout(creationCallback.bind(null, that), 0); }
         }
     }
 
