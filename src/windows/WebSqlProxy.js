@@ -18,9 +18,9 @@ module.exports = {
     getVersion: function(success, fail, args) {
         try {
             var dbName = args.shift();
-            this.db = generateDbPath(dbName);
+            module.exports.db = generateDbPath(dbName);
 
-            var res = SQLite.Proxy.SQLiteProxy.getVersion(this.db);
+            var res = SQLite.Proxy.SQLiteProxy.getVersion(module.exports.db);
             res = JSON.parse(res);
 
             if (res && res.message) {
@@ -39,9 +39,9 @@ module.exports = {
             var dbName = args.shift();
             var version = args.shift();
 
-            this.db = generateDbPath(dbName);
+            module.exports.db = generateDbPath(dbName);
 
-            var res = SQLite.Proxy.SQLiteProxy.setVersion(this.db, version);
+            var res = SQLite.Proxy.SQLiteProxy.setVersion(module.exports.db, version);
             res = JSON.parse(res);
 
             if (res && res.message) {
@@ -62,7 +62,7 @@ module.exports = {
 
     open: function (success, fail, args) {
         try {
-            this.db = generateDbPath(args[0]);
+            module.exports.db = generateDbPath(args[0]);
             success();
         } catch(ex) {
             fail(ex);
@@ -71,7 +71,7 @@ module.exports = {
 
     close: function (success, fail, args) {
         try {
-            this.db = null;
+            module.exports.db = null;
             success();
         } catch (ex) {
             fail(ex);
@@ -101,9 +101,9 @@ module.exports = {
     connect: function(success, fail, args) {
         try {
             var dbName = args.shift();
-            this.db = generateDbPath(dbName);
+            module.exports.db = generateDbPath(dbName);
 
-            var res = SQLite.Proxy.SQLiteProxy.connectToDb(this.db);
+            var res = SQLite.Proxy.SQLiteProxy.connectToDb(module.exports.db);
             res = JSON.parse(res);
 
             if (res && res.message) {
