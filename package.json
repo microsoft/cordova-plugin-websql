@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-websql",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Cordova Websql Plugin",
   "cordova": {
     "id": "cordova-plugin-websql",

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) Microsoft Open Technologies, Inc.  All Rights Reserved. 
+ Copyright (c) Microsoft Open Technologies, Inc.  All Rights Reserved.
  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 -->
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
            id="cordova-plugin-websql"
-      version="0.0.8">
+      version="0.0.9">
     <name>Web SQL plugin</name>
 
     <description>Web Sql Plugin for Apache Cordova</description>
@@ -49,14 +49,14 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         </js-module>
     </platform>
 
-    <platform name="windows">  
+    <platform name="windows">
         <js-module src="www/WebSQL.js" name="WebSQL">
             <merges target="window" />
         </js-module>
         <js-module src="www/windows/Database.js" name="Database" />
         <js-module src="www/windows/SqlTransaction.js" name="SqlTransaction" />
 
-        <framework src="src/windows/SQLite.Proxy/SQLite.Proxy/SQLite.Proxy.csproj" 
+        <framework src="src/windows/SQLite.Proxy/SQLite.Proxy/SQLite.Proxy.csproj"
             custom="true" type="projectReference" target="windows" />
 
         <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
