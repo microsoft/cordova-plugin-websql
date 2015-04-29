@@ -100,10 +100,9 @@ namespace SQLite.Proxy
                     if (i == _retriesCount - 1)
                         return Serialize(typeof(InvocationError), new InvocationError(ex));
                 }
-                return Serialize(result.GetType(), result);
             }
 
-            return Serialize(typeof(InvocationError), new InvocationError(new SqliteException(-1)));
+            return Serialize(result.GetType(), result);
         }
 
         public static string Disconnect(long connectionId)
