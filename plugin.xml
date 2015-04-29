@@ -57,7 +57,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
         <js-module src="www/windows/SqlTransaction.js" name="SqlTransaction" />
 
         <framework src="src/windows/SQLite.Proxy/SQLite.Proxy/SQLite.Proxy.csproj"
-            custom="true" type="projectReference" target="windows" />
+            custom="true" type="projectReference" target="all" />
 
         <js-module src="src/windows/WebSqlProxy.js" name="WebSqlProxy">
             <runs />
