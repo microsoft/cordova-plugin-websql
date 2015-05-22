@@ -90,7 +90,13 @@ Based on [this StackOverflow question](http://stackoverflow.com/questions/150682
 ### Quirks ###
 * The display name, and size parameter values are not supported and will be ignored.
 
-* db version parameter to `openDatabase` and `changeVersion` method are supported only on windows platform. Due to SQLite limitations, version number should be an integer value or integer's string representation.
+* Due to SQLite limitations db version parameter to `openDatabase` and `changeVersion` methods should be an integer value or integer's string representation.
+
+* openDatabase on WP8 bypass version check by default. The reason of this is async nature of cordova calls to native APIs. To force version check and enable full versioning functionality set up the following variable:
+
+    ```javascript
+    window.__webSqlUseSyncConstructor = true;
+    ```
 
 * To use nested transactions you will need to pass parent transaction like this:
     ```javascript
@@ -106,7 +112,7 @@ Based on [this StackOverflow question](http://stackoverflow.com/questions/150682
     }, null, null);
     ```
     `tx1` passed as the last argument in the nested `db.transaction` refers to the parent transaction.
-    
+
     Other arguments (`null, null, null, null, false, tx1`) are:
     * the db.transaction error callback,
     * the db.transaction success callback,

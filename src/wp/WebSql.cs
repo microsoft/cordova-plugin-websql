@@ -4,6 +4,7 @@
  */
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ namespace Cordova.Extension.Commands
                 Value = value;
             }
         }
-        
+
         [DataContract]
         private class ConnectionInfo
         {
@@ -59,9 +60,9 @@ namespace Cordova.Extension.Commands
         [DataContract]
         private class SQliteError
         {
-            [DataMember(Name = "message")] 
+            [DataMember(Name = "message")]
             public string Message;
-            [DataMember(Name = "code")] 
+            [DataMember(Name = "code")]
             public int Code;
 
             public SQliteError(Exception ex)
@@ -88,6 +89,7 @@ namespace Cordova.Extension.Commands
         /// We don't connect to the database here, we just save database name for further access.
         /// </summary>
         /// <param name="options"></param>
+        // ReSharper disable once UnusedMember.Global, InconsistentNaming
         public void open(string options)
         {
             lock (_locker)
@@ -96,9 +98,58 @@ namespace Cordova.Extension.Commands
                 {
                     var args = JsonHelper.Deserialize<List<string>>(options);
 
-                    String dbName = args[0];
+                    var dbName = args[0];
+                    var dbVersion = args[1];
                     _dbName = dbName;
-                    DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+
+                    for (var i = 0; i < _retriesCount; i++)
+                    {
+                        try
+                        {
+                            using (var connection = new SQLiteConnection(dbName))
+                            {
+                                const string versionCommand = "PRAGMA user_version";
+                                var getVersionCommand = new SQLiteCommand(connection) { CommandText = versionCommand };
+                                var setVersionCommand = new SQLiteCommand(connection) { CommandText = versionCommand + "=" + dbVersion };
+
+                                var actualDbVersion = getVersionCommand.ExecuteScalar<int>();
+
+                                if (dbVersion == "0" || dbVersion == actualDbVersion.ToString(CultureInfo.InvariantCulture)) {
+                                    // If we don't care of DB version or versions are matching then just report back actual version
+                                    DispatchCommandResult(new PluginResult(PluginResult.Status.OK, actualDbVersion));
+                                    break;
+                                }
+
+                                if (actualDbVersion == 0) {
+                                    // If actual version is 0, then database either is just created or it's version hadn't been set yet.
+                                    // In this case we're reporting back new version ASAP
+                                    DispatchCommandResult(new PluginResult(PluginResult.Status.OK, dbVersion));
+
+                                    // and update it's version to version, provided by user
+                                    if (dbVersion != "0")
+                                    {
+                                        setVersionCommand.ExecuteScalar<int>();
+                                    }
+
+                                    break;
+                                }
+
+                                // Otherwise fail with version mismatch error
+                                var errorMessage =
+                                    string.Format(
+                                        "Unable to open database, version mismatch, {0} does not match the currentVersion of {1}",
+                                        actualDbVersion, dbVersion);
+
+                                DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, errorMessage));
+                                break;
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            if (i != _retriesCount - 1) continue;
+                            throw;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
