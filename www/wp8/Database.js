@@ -5,6 +5,9 @@
 var exec = require('cordova/exec'),
     SqlTransaction = require('./SqlTransaction');
 
+var READONLY = true;
+var READWRITE = false;
+
 var Database = function (name, version, displayName, estimatedSize, creationCallback) {
     // // Database openDatabase(in DOMString name, in DOMString version, in DOMString displayName, in unsigned long estimatedSize, in optional DatabaseCallback creationCallback
     // TODO: duplicate native error messages
@@ -12,9 +15,19 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
         throw new Error('Database name can\'t be null or empty');
     }
     this.name = name;
-    this.version = version; // not supported
     this.displayName = displayName; // not supported
     this.estimatedSize = estimatedSize; // not supported
+
+    // This is due to SQLite limitation which uses integer version type
+    // (websql spec uses strings so you can use “1.3-dev2” for example)
+    if (version === 0 || version === "") {
+        this.version = 0;
+    } else {
+        this.version = parseInt(version, 10);
+        if (isNaN(this.version)) {
+            throw new Error("Database version should be a number or its string representation");
+        }
+    }
 
     this.lastTransactionId = 0;
     this.tasksQueue = [];
@@ -22,15 +35,32 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
 
     this.Log('new Database(); name = ' + name);
 
+    var opened = false;
     var that = this;
 
-    function creationCallbackAsyncWrapper() {
-        setTimeout(creationCallback, 0);
+    var openCallback = function(newVersion) {
+        that.version = parseInt(newVersion, 10);
+        opened = true;
+    };
+
+    var openFail = function(err) {
+        throw err;
+    };
+
+    exec(openCallback, openFail, "WebSql", "open", [this.name, this.version]);
+
+    if (window.__webSqlUseSyncConstructor === true) {
+        var start = new Date().getTime();
+        while (!opened) {
+            // empty cycle - need to wait until all routines are finished before returning a database
+            that.Log('Waiting until database is opened...');
+        }
+        var end = new Date().getTime();
+        var time = end - start;
+        that.Log('Execution time: ' + time);
     }
 
-    exec(creationCallbackAsyncWrapper, function (err) {
-        that.Log('Database.open() err = ' + JSON.stringify(err));
-    }, "WebSql", "open", [this.name]);
+    creationCallback && setTimeout(creationCallback, 0);
 };
 
 Database.prototype.Log = function (text) {
@@ -69,7 +99,7 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
     this.transactionSuccess = function () {
         if (onSuccess) {
             onSuccess();
-        }            
+        }
 
         me.runNext();
     };
@@ -128,7 +158,11 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
                         } catch (cbEx) {
                             me.Log('transaction.run.connectionSuccess, executeTransaction callback error: ' + JSON.stringify(cbEx));
                             me.transactionError(tx, cbEx);
-                        }                        
+                        }
+
+                        if (postflight) {
+                            postflight();
+                        }
                     };
 
                     var internalError = function(tx, err) {
@@ -173,6 +207,40 @@ Database.prototype.transaction = function (cb, onError, onSuccess, preflight, po
 Database.prototype.readTransaction = function (cb, onError, onSuccess, preflight, postflight, parentTransaction) {
     //this.Log('readTransaction');
     this.transaction(cb, onError, onSuccess, preflight, postflight, true, parentTransaction);
+};
+
+Database.prototype.changeVersion = function (oldVersion, newVersion, cb, onError, onSuccess, parentTransaction) {
+
+    var transaction;
+    var that = this;
+    var oldver = parseInt(oldVersion, 10);
+    var newVer = parseInt(newVersion, 10);
+
+    if (isNaN(oldver) || isNaN(newVer)) {
+        throw new Error("Version parameters should be valid integers or its' string representation");
+    }
+
+    var callback = function (tx) {
+        // Just save a transaction here so we can use it later in postflight
+        transaction = tx;
+        cb(tx);
+    };
+
+    var preflight = function () {
+        if (oldver != that.version) {
+            throw new Error("Version mismatch. First param to changeVersion is not equal to current database version");
+        }
+    };
+
+    var postflight = function () {
+        transaction.executeSql('PRAGMA user_version=' + newVer, null, function () {
+            that.version = newVer;
+        }, function () {
+            throw new Error("Failed to set database version");
+        });
+    };
+
+    this.transaction(callback, onError, onSuccess, preflight, postflight, READWRITE, parentTransaction);
 };
 
 module.exports = Database;
