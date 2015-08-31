@@ -16,8 +16,16 @@ var app = {
     },
 
     onSuccess: function (transaction, resultSet) {
+        var insertId = null;
         console.log('Operation completed successfully');
-        document.getElementById("lblTxInfo").innerHTML = 'RowsAffected: ' + resultSet.rowsAffected + '; InsertId: ' + resultSet.insertId;
+        try {
+            insertId = resultSet.insertId;
+        } catch (ex) {
+            // If the statement did not insert a row, then the attribute must instead raise an INVALID_ACCESS_ERR exception.
+            // http://www.w3.org/TR/webdatabase/#database-query-results
+            console.log('insertId: null');
+        }
+        document.getElementById("lblTxInfo").innerHTML = 'RowsAffected: ' + resultSet.rowsAffected + '; InsertId: ' + insertId;
         app.getAllTodoItems(transaction);
     },
 
