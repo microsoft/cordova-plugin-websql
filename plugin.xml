@@ -6,7 +6,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
 xmlns:android="http://schemas.android.com/apk/res/android"
            id="cordova-plugin-websql"
-      version="0.0.9">
+      version="0.0.10">
     <name>Web SQL plugin</name>
 
     <description>Web Sql Plugin for Apache Cordova</description>

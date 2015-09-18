@@ -43,7 +43,7 @@ Plugin is [Apache Cordova CLI](http://cordova.apache.org/docs/en/edge/guide_cli_
 
 3. Add WebSql plugin to your project:
 
-        cordova plugin add com.msopentech.websql
+        cordova plugin add cordova-plugin-websql
 
 4. Build and run, for example:
 
