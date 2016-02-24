@@ -22,7 +22,7 @@ var Database = function (name, version, displayName, estimatedSize, creationCall
 
     // This is due to SQLite limitation which uses integer version type
     // (websql spec uses strings so you can use “1.3-dev2” for example)
-    if (version === 0 || version === "") {
+    if (version === 0 || version === "" || version === null) {
         this.version = 0;
     } else {
         this.version = parseInt(version, 10);
